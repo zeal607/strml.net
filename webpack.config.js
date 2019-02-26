@@ -31,9 +31,25 @@ module.exports = {
     port: 4003,
   },
   plugins: [
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({compress: {warnings: false}})
+    new webpack.optimize.OccurrenceOrderPlugin()
   ],
+  //webpack 4之后一般是通过指定mode来自动优化，但也支持如下的手动配置来覆盖默认优化
+  // optimization:{
+  //   minimize: false
+  // },
+  //允许通过提供一个或多个自定义TerserPlugin实例来覆盖默认的minimzer
+  //optimization: {
+  //   minimizer: [
+  //     new TerserPlugin({
+  //       cache: true,
+  //       parallel: true,
+  //       sourceMap: true, // Must be set to true if using source-maps in production
+  //       terserOptions: {
+  //         // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
+  //       }
+  //     }),
+  //   ],
+  // },
   resolve: {
   }
 };
