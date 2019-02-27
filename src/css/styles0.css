@@ -1,23 +1,24 @@
 /**
  *
- * Hey. My name's Samuel Reed. I'm CTO of BitMEX.com and frequent
- * open source contributor.
+ * 大家好，我是刘东奇，是一名从事Web开发的软件工程师。
+ * 相对于后端，我对前端领域更感兴趣，因为前端开发的即时反馈所带来的成就感是后端难以比拟的。
  *
- * I build interactive websites.
+ * 不信，我们一起敲一些代码，体会一下！
+ *（本项目参考自国外一位程序员之手，strml.net）
  *
- * How about some live coding?
  */
 
 /**
- * Let's begin. We start by animating... well, everything.
+ * 首先给所有元素、所有css属性设置1秒钟的过渡效果
  */
 
 * {
-  -webkit-transition: all 1s;
+-webkit-transition: all 1s;
 }
 
 /**
- * That didn't do much. But you'll see.
+ * 由于目前没有任何元素的任何属性发生改变，所以我们暂时感受不到效果
+ * 不过，接下来将不同。。。
  *
  * Black on white is really boring,
  * so let's do something about it.

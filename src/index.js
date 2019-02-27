@@ -13,12 +13,14 @@ import getPrefix from '../lib/getPrefix';
 
 // Vars that will help us get er done
 // const isDev = window.location.hostname === 'localhost';
-const speed = 16;
-let style, styleEl, workEl, pgpEl, skipAnimationEl, pauseEl;
+const speed = 60;
+let styleTag, //style标签
+styleInputEl, //style文本输入框
+ workEl, pgpEl, skipAnimationEl, pauseEl;
 let animationSkipped = false, done = false, paused = false;
 let browserPrefix;
 
-// Wait for load to get started.
+// 页面载入完成后的初始化
 document.addEventListener("DOMContentLoaded", function() {
   getBrowserPrefix();
   populateHeader();
@@ -29,14 +31,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
 async function startAnimation() {
   try {
-    await writeTo(styleEl, styleText[0], 0, speed, true, 1);
-    await writeTo(workEl, workText, 0, speed, false, 1);
-    await writeTo(styleEl, styleText[1], 0, speed, true, 1);
+    await writeTo(styleInputEl, styleText[0], 0, speed, true, 1);
+    // await writeTo(workEl, workText, 0, speed, false, 1);
+    await writeTo(styleInputEl, styleText[1], 0, speed, true, 1);
     createWorkBox();
     await Promise.delay(1000);
-    await writeTo(styleEl, styleText[2], 0, speed, true, 1);
+    await writeTo(styleInputEl, styleText[2], 0, speed, true, 1);
     await writeTo(pgpEl, pgpText, 0, speed, false, 32);
-    await writeTo(styleEl, styleText[3], 0, speed, true, 1);
+    await writeTo(styleInputEl, styleText[3], 0, speed, true, 1);
   }
   // Flow control straight from the ghettos of Milwaukee
   catch(e) {
@@ -56,20 +58,20 @@ async function surprisinglyShortAttentionSpan() {
   let txt = styleText.join('\n');
 
   // The work-text animations are rough
-  style.textContent = "#work-text * { " + browserPrefix + "transition: none; }";
-  style.textContent += txt;
+  styleTag.textContent = "#work-text * { " + browserPrefix + "transition: none; }";
+  styleTag.textContent += txt;
   let styleHTML = "";
   for(let i = 0; i < txt.length; i++) {
      styleHTML = handleChar(styleHTML, txt[i]);
   }
-  styleEl.innerHTML = styleHTML;
+  styleInputEl.innerHTML = styleHTML;
   createWorkBox();
 
   // There's a bit of a scroll problem with this thing
   let start = Date.now();
   while(Date.now() - 1000 > start) {
     workEl.scrollTop = Infinity;
-    styleEl.scrollTop = pgpEl.scrollTop = Infinity;
+    styleInputEl.scrollTop = pgpEl.scrollTop = Infinity;
     await Promise.delay(16);
   }
 }
@@ -83,21 +85,30 @@ let endOfSentence = /[\.\?\!]\s$/;
 let comma = /\D[\,]\s$/;
 let endOfBlock = /[^\/]\n\n$/;
 
+/**
+ * 
+ * @param {*} el 容器元素
+ * @param {*} message 内容
+ * @param {*} index 字符序号
+ * @param {*} interval 
+ * @param {*} mirrorToStyle 
+ * @param {*} charsPerInterval 每次渲染几个字符
+ */
 async function writeTo(el, message, index, interval, mirrorToStyle, charsPerInterval){
   if (animationSkipped) {
-    // Lol who needs proper flow control
+    // 跳过动画
     throw new Error('SKIP IT');
   }
-  // Write a character or multiple characters to the buffer.
+  // 获取待渲染的字符
   let chars = message.slice(index, index + charsPerInterval);
   index += charsPerInterval;
 
-  // Ensure we stay scrolled to the bottom.
+  // 确保滚动条处于最下方
   el.scrollTop = el.scrollHeight;
 
   // If this is going to <style> it's more complex; otherwise, just write.
   if (mirrorToStyle) {
-    writeChar(el, chars, style);
+    writeChar(el, chars, styleTag);
   } else {
     writeSimpleChar(el, chars);
   }
@@ -131,17 +142,15 @@ function getBrowserPrefix() {
 }
 
 //
-// Put els into the module scope.
+// 载入基础样式,获取元素引用
 //
 function getEls() {
-  // We're cheating a bit on styles.
   let preStyleEl = document.createElement('style');
   preStyleEl.textContent = preStyles;
   document.head.insertBefore(preStyleEl, document.getElementsByTagName('style')[0]);
 
-  // El refs
-  style = document.getElementById('style-tag');
-  styleEl = document.getElementById('style-text');
+  styleTag = document.getElementById('style-tag');
+  styleInputEl = document.getElementById('style-text');
   workEl = document.getElementById('work-text');
   pgpEl = document.getElementById('pgp-text');
   skipAnimationEl = document.getElementById('skip-animation');
@@ -149,7 +158,7 @@ function getEls() {
 }
 
 //
-// Create links in header (now footer).
+// 插入头部html
 //
 function populateHeader() {
   let header = document.getElementById('header');
@@ -157,27 +166,27 @@ function populateHeader() {
 }
 
 //
-// Create basic event handlers for user input.
+// 创建针对用户操作的基本监听
 //
 function createEventHandlers() {
-  // Mirror user edits back to the style element.
-  styleEl.addEventListener('input', function() {
-    style.textContent = styleEl.textContent;
+  // 监听用户对样式的修改，并实时渲染
+  styleInputEl.addEventListener('input', function() {
+    styleTag.textContent = styleInputEl.textContent;
   });
 
-  // Skip anim on click to skipAnimation
+  //跳过动画
   skipAnimationEl.addEventListener('click', function(e) {
     e.preventDefault();
     animationSkipped = true;
   });
-
+  //暂停与继续
   pauseEl.addEventListener('click', function(e) {
     e.preventDefault();
     if (paused) {
-      pauseEl.textContent = "Pause ||";
+      pauseEl.textContent = "暂停 ||";
       paused = false;
     } else {
-      pauseEl.textContent = "Resume >>";
+      pauseEl.textContent = "继续 >>";
       paused = true;
     }
   });
